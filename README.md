@@ -1,3 +1,3 @@
-# portfolio
+# Patrick Billingsley's Portfolio
 
-A new Flutter project.
+The personal portfolio of Patrick Billingsley.
