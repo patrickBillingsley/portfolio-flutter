@@ -14,12 +14,13 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return MouseRegion(
       onHover: MouseService().setPosition,
+      onExit: MouseService().clearPosition,
       child: Scaffold(
         backgroundColor: Colors.black87,
         body: PolkaDots(
           image: Image.asset(
             'images/flutter_dash.png',
-            fit: BoxFit.fitWidth,
+            fit: BoxFit.cover,
           ),
         ),
       ),

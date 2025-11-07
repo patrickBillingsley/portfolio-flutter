@@ -16,4 +16,8 @@ class MouseService {
   void setPosition(PointerHoverEvent event) {
     _positionSubject.add(event.position);
   }
+
+  void clearPosition(PointerExitEvent event) {
+    _positionSubject.add(Offset(-1000, -1000));
+  }
 }

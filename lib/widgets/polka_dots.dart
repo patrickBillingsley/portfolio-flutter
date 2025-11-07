@@ -68,7 +68,7 @@ class PolkaDot extends StatefulWidget {
 class _PolkaDotState extends State<PolkaDot> {
   late final StreamSubscription<Offset> _mousePositionSubscription;
 
-  Offset _mousePosition = Offset(-1, -1);
+  Offset _mousePosition = Offset(-1000, -1000);
   double get radius {
     final distance = (widget.offset - _mousePosition).distance;
     final maxDistance = widget.width * 2;
@@ -91,7 +91,6 @@ class _PolkaDotState extends State<PolkaDot> {
   }
 
   void _setMousePosition(Offset position) {
-    print('Updating position!');
     setState(() {
       _mousePosition = position;
     });
