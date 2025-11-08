@@ -30,12 +30,10 @@ class _FixtureFieldState extends State<FixtureField> {
     for (var i = 0; i < fixtureCount; i++) {
       final offset = initialOffset + Offset(cellWidth * i, 0);
       final fixture = Fixture(
-        key: Key('fixture_$i'),
+        index: i,
         center: offset,
         radius: cellWidth * 0.5,
       );
-
-      _controller.register(fixture);
 
       fixtures.add(fixture);
     }

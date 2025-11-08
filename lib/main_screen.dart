@@ -36,8 +36,14 @@ class _MainScreenState extends State<MainScreen> {
             Padding(
               padding: const EdgeInsets.all(40),
               child: FilledButton(
-                onPressed: _fixtureController.pulse,
-                child: const Text('Pulse'),
+                onPressed: () {
+                  if (_fixtureController.isPlaying) {
+                    _fixtureController.stop();
+                  } else {
+                    _fixtureController.pulse(max: 2.0);
+                  }
+                },
+                child: Text(_fixtureController.isPlaying ? 'Stop' : 'Pulse'),
               ),
             ),
           ],

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/controllers/fixture_controller.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
@@ -8,71 +6,43 @@ class FixtureWidget extends StatefulWidget {
   final FixtureController controller;
   final Fixture fixture;
 
-  const FixtureWidget({
-    super.key,
+  FixtureWidget({
     required this.controller,
     required this.fixture,
-  });
+  }) : super(key: fixture.key);
 
   @override
   State<FixtureWidget> createState() => _FixtureWidgetState();
 }
 
-class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 150),
-    reverseDuration: const Duration(milliseconds: 400),
-  );
-
-  late final Tween<double> _zoomTween = Tween(
-    begin: widget.fixture.zoom,
-    end: widget.fixture.zoom,
-  );
-
-  Animation<double> get _zoomAnimation => _zoomTween.animate(_animationController);
-
-  late final StreamSubscription<Fixture> _fixtureSubscription;
-
-  late Fixture _fixture = widget.fixture;
-  late double _zoom = _fixture.zoom;
-
+class _FixtureWidgetState extends State<FixtureWidget> {
   @override
   void initState() {
     super.initState();
-    _fixtureSubscription = widget.controller.streamFor(widget.fixture).listen(_handleFixture);
-    _animationController.addListener(
-      () => setState(() {
-        _zoom = _zoomAnimation.value;
-      }),
-    );
+    widget.controller.register(widget.fixture);
+    widget.fixture.addListener(_refresh);
   }
 
   @override
   void dispose() {
-    _fixtureSubscription.cancel();
-    _animationController.dispose();
+    widget.fixture.removeListener(_refresh);
     super.dispose();
   }
 
-  void _handleFixture(Fixture fixture) {
-    _fixture = fixture;
-    _zoomTween.begin = _zoom;
-    _zoomTween.end = fixture.zoom;
-
-    _animationController.forward(from: 0);
+  void _refresh() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Positioned.fromRect(
       rect: Rect.fromCircle(
-        center: _fixture.center,
-        radius: _fixture.radius * _zoom,
+        center: widget.fixture.center,
+        radius: widget.fixture.radius * widget.fixture.zoom,
       ),
       child: ClipOval(
         child: Container(
-          color: _fixture.color,
+          color: widget.fixture.color,
         ),
       ),
     );

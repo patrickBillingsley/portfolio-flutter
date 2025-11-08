@@ -1,52 +1,66 @@
-import 'dart:async';
+import 'dart:math';
 
+import 'package:flutter/scheduler.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
-import 'package:rxdart/subjects.dart';
 
 class FixtureController {
-  final BehaviorSubject<Set<Fixture>> _subject = BehaviorSubject.seeded({});
-  List<Fixture> get fixtures => List.from(_subject.value);
+  Ticker? _ticker;
 
-  Stream<Fixture> streamFor(Fixture fixture) {
-    return _subject.stream.map((event) {
-      return event.firstWhere((f) => f.key == fixture.key);
-    });
-  }
+  final List<Fixture> _fixtures = [];
+
+  bool get isPlaying => _ticker?.isActive ?? false;
 
   void register(Fixture fixture) {
-    final updatedFixtures = fixtures
-      ..remove(fixture)
-      ..add(fixture);
-    _subject.add(updatedFixtures.toSet());
+    _fixtures.insert(fixture.index, fixture);
   }
 
-  Future<void> pulse() async {
-    final duration = const Duration(milliseconds: 100);
-    for (var i = 0; i < fixtures.length; i++) {
-      final fixture = fixtures.elementAt(i);
-      _subject.add(
-        Set<Fixture>.from(
-          fixtures..replaceRange(i, i, [
-            fixture.copyWith(
-              zoom: 0.5,
-            ),
-          ]),
-        ),
-      );
-      await Future.delayed(duration);
+  void stop() {
+    _ticker?.stop();
+    for (final fixture in _fixtures) {
+      fixture.update(zoom: 1.0);
     }
-    for (var i = 0; i < fixtures.length; i++) {
-      final fixture = fixtures.elementAt(i);
-      _subject.add(
-        Set<Fixture>.from(
-          fixtures..replaceRange(i, i, [
-            fixture.copyWith(
-              zoom: 1.0,
-            ),
-          ]),
-        ),
-      );
-      await Future.delayed(duration);
-    }
+  }
+
+  void pulse({
+    Duration? duration,
+    double min = 0.5,
+    double max = 1.0,
+  }) {
+    _ticker?.dispose();
+    _ticker = Ticker((elapsed) {
+      if (duration != null && elapsed > duration) {
+        _ticker?.stop();
+        return;
+      }
+
+      final timeInSeconds = elapsed.inMilliseconds / 1000.0;
+      for (var i = 0; i < _fixtures.length; i++) {
+        final sineWave = SineWaveGenerator(phase: 90 * (i + 1));
+        _fixtures[i].update(
+          zoom: sineWave.getNormalizedValue(timeInSeconds, min: min, max: max),
+        );
+      }
+    })..start();
+  }
+}
+
+class SineWaveGenerator {
+  double frequency;
+  double amplitude;
+  double phase;
+
+  SineWaveGenerator({
+    this.frequency = 1.0,
+    this.amplitude = 1.0,
+    this.phase = 90.0,
+  });
+
+  double getValue(double time) {
+    return amplitude * sin(2 * pi * frequency * time + phase);
+  }
+
+  double getNormalizedValue(double time, {double min = 0.0, double max = 1.0}) {
+    final normalizedValue = (getValue(time) + amplitude) / (2 * amplitude);
+    return min + normalizedValue * (max - min);
   }
 }

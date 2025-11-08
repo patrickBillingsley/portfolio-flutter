@@ -1,38 +1,52 @@
 import 'package:flutter/material.dart';
 
-class Fixture extends Object {
-  final Key? key;
-  final Offset center;
-  final double radius;
-  final Color color;
-  final double zoom;
+class Fixture extends ChangeNotifier {
+  final int _index;
+  Offset _center;
+  double _radius;
+  Color _color;
+  double _zoom;
 
-  const Fixture({
-    this.key,
-    this.center = Offset.zero,
-    this.radius = 100,
-    this.color = Colors.red,
-    this.zoom = 1.0,
-  });
+  int get index => _index;
+  Offset get center => _center;
+  double get radius => _radius;
+  Color get color => _color;
+  double get zoom => _zoom;
 
-  Fixture copyWith({
+  Fixture({
+    int index = 0,
+    Offset center = Offset.zero,
+    double radius = 100,
+    Color color = Colors.red,
+    double zoom = 1.0,
+  }) : _index = index,
+       _center = center,
+       _radius = radius,
+       _color = color,
+       _zoom = zoom;
+
+  Key get key => Key('fixture_$index');
+
+  void update({
+    Offset? center,
+    double? radius,
+    Color? color,
     double? zoom,
   }) {
-    return Fixture(
-      key: key,
-      center: center,
-      radius: radius,
-      color: color,
-      zoom: zoom ?? this.zoom,
-    );
+    _center = center ?? _center;
+    _radius = radius ?? _radius;
+    _color = color ?? _color;
+    _zoom = zoom ?? _zoom;
+
+    notifyListeners();
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Fixture && other.key == key;
+    return other is Fixture && other.index == index;
   }
 
   @override
-  int get hashCode => key.hashCode;
+  int get hashCode => index.hashCode;
 }
