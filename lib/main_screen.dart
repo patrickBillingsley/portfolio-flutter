@@ -10,8 +10,14 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  final FixtureController _fixtureController = FixtureController();
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+  late final FixtureController _fixtureController = FixtureController(vsync: this, lowerBound: 0.5, upperBound: 2.0, value: 1.0);
+
+  @override
+  void dispose() {
+    _fixtureController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +43,13 @@ class _MainScreenState extends State<MainScreen> {
               padding: const EdgeInsets.all(40),
               child: FilledButton(
                 onPressed: () {
-                  if (_fixtureController.isPlaying) {
+                  if (_fixtureController.isAnimating) {
                     _fixtureController.stop();
                   } else {
-                    _fixtureController.pulse(max: 2.0);
+                    _fixtureController.pulse();
                   }
                 },
-                child: Text(_fixtureController.isPlaying ? 'Stop' : 'Pulse'),
+                child: Text(_fixtureController.isAnimating ? 'Stop' : 'Pulse'),
               ),
             ),
           ],

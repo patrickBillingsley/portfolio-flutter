@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 
 class Fixture extends ChangeNotifier {
-  final int _index;
+  final int col;
+  final int row;
   Offset _center;
   double _radius;
   Color _color;
   double _zoom;
 
-  int get index => _index;
   Offset get center => _center;
   double get radius => _radius;
   Color get color => _color;
   double get zoom => _zoom;
 
   Fixture({
-    int index = 0,
+    this.col = 0,
+    this.row = 0,
     Offset center = Offset.zero,
     double radius = 100,
     Color color = Colors.red,
     double zoom = 1.0,
-  }) : _index = index,
-       _center = center,
+  }) : _center = center,
        _radius = radius,
        _color = color,
        _zoom = zoom;
 
-  Key get key => Key('fixture_$index');
+  Key get key => Key('fixture_${col}_$row');
 
   void update({
     Offset? center,
@@ -44,9 +44,9 @@ class Fixture extends ChangeNotifier {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Fixture && other.index == index;
+    return other is Fixture && other.key == key;
   }
 
   @override
-  int get hashCode => index.hashCode;
+  int get hashCode => key.hashCode;
 }

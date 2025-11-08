@@ -1,46 +1,79 @@
 import 'dart:math';
 
-import 'package:flutter/scheduler.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 
 class FixtureController {
-  Ticker? _ticker;
+  final AnimationController _animation;
+  final double lowerBound;
+  final double upperBound;
+  final int cols;
+  final int rows;
 
-  final List<Fixture> _fixtures = [];
+  FixtureController({
+    double? value,
+    this.lowerBound = double.negativeInfinity,
+    this.upperBound = double.infinity,
+    this.cols = 10,
+    this.rows = 10,
+    required TickerProvider vsync,
+  }) : assert(upperBound >= lowerBound),
+       _animation = AnimationController(
+         vsync: vsync,
+         lowerBound: lowerBound,
+         upperBound: upperBound,
+         value: value,
+       );
 
-  bool get isPlaying => _ticker?.isActive ?? false;
+  double get value => _animation.value;
 
-  void register(Fixture fixture) {
-    _fixtures.insert(fixture.index, fixture);
+  bool get isAnimating => _animation.isAnimating;
+
+  final List<List<Fixture?>> _fixtures = [];
+  List<Fixture> get fixtures => List.from(_fixtures.flattenedToList.nonNulls);
+
+  void initialize(int rows, int cols) {
+    _fixtures.clear();
+    for (var i = 0; i < rows; i++) {
+      _fixtures.add(List<Fixture?>.filled(cols, null));
+    }
   }
 
-  void stop() {
-    _ticker?.stop();
-    for (final fixture in _fixtures) {
+  void dispose() {
+    _animation.dispose();
+  }
+
+  void register(Fixture fixture) {
+    _fixtures[fixture.row][fixture.col] = fixture;
+  }
+
+  void stop({bool canceled = true}) {
+    _animation.stop();
+    for (final fixture in fixtures) {
       fixture.update(zoom: 1.0);
     }
   }
 
   void pulse({
-    Duration? duration,
+    Duration duration = const Duration(seconds: 5),
     double min = 0.5,
     double max = 1.0,
+    Color colorMin = Colors.blue,
+    Color colorMax = Colors.red,
   }) {
-    _ticker?.dispose();
-    _ticker = Ticker((elapsed) {
-      if (duration != null && elapsed > duration) {
-        _ticker?.stop();
-        return;
-      }
-
-      final timeInSeconds = elapsed.inMilliseconds / 1000.0;
-      for (var i = 0; i < _fixtures.length; i++) {
+    _animation.addListener(() {
+      final timeInSeconds = (_animation.lastElapsedDuration?.inMilliseconds ?? 0) / 1000.0;
+      for (var i = 0; i < fixtures.length; i++) {
         final sineWave = SineWaveGenerator(phase: 90 * (i + 1));
-        _fixtures[i].update(
-          zoom: sineWave.getNormalizedValue(timeInSeconds, min: min, max: max),
+        final normalizedValue = sineWave.getNormalizedValue(timeInSeconds, min: min, max: max);
+        fixtures[i].update(
+          zoom: normalizedValue,
+          color: Color.lerp(colorMin, colorMax, sineWave.getNormalizedValue(timeInSeconds)),
         );
       }
-    })..start();
+    });
+    _animation.repeat(min: min, max: max, reverse: true, period: duration);
   }
 }
 
