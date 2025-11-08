@@ -32,15 +32,16 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         //     fit: BoxFit.cover,
         //   ),
         // ),
-        body: Column(
+        body: Stack(
           children: [
-            Expanded(
-              child: FixtureField(
-                controller: _fixtureController,
-              ),
+            FixtureField(
+              controller: _fixtureController,
             ),
-            Padding(
-              padding: const EdgeInsets.all(40),
+            Positioned(
+              width: 200,
+              height: 200,
+              bottom: 16,
+              right: 16,
               child: FilledButton(
                 onPressed: () {
                   if (_fixtureController.isAnimating) {
@@ -49,6 +50,11 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                     _fixtureController.pulse();
                   }
                 },
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(16),
+                  ),
+                ),
                 child: Text(_fixtureController.isAnimating ? 'Stop' : 'Pulse'),
               ),
             ),
