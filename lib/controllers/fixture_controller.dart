@@ -4,12 +4,15 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 
-class FixtureController {
+class FixtureController with ChangeNotifier {
   final AnimationController _animation;
   final double lowerBound;
   final double upperBound;
   final int cols;
   final int rows;
+
+  final List<List<Fixture?>> _fixtures = [];
+  List<Fixture> get fixtures => List.from(_fixtures.flattenedToList.nonNulls);
 
   FixtureController({
     double? value,
@@ -24,24 +27,19 @@ class FixtureController {
          lowerBound: lowerBound,
          upperBound: upperBound,
          value: value,
-       );
-
-  double get value => _animation.value;
-
-  bool get isAnimating => _animation.isAnimating;
-
-  final List<List<Fixture?>> _fixtures = [];
-  List<Fixture> get fixtures => List.from(_fixtures.flattenedToList.nonNulls);
-
-  void initialize(int rows, int cols) {
-    _fixtures.clear();
-    for (var i = 0; i < rows; i++) {
+       ) {
+    for (var row = 0; row < rows; row++) {
       _fixtures.add(List<Fixture?>.filled(cols, null));
     }
   }
 
+  double get value => _animation.value;
+  bool get isAnimating => _animation.isAnimating;
+
+  @override
   void dispose() {
     _animation.dispose();
+    super.dispose();
   }
 
   void register(Fixture fixture) {
@@ -53,6 +51,7 @@ class FixtureController {
     for (final fixture in fixtures) {
       fixture.update(zoom: 1.0);
     }
+    notifyListeners();
   }
 
   void pulse({
@@ -74,6 +73,7 @@ class FixtureController {
       }
     });
     _animation.repeat(min: min, max: max, reverse: true, period: duration);
+    notifyListeners();
   }
 }
 

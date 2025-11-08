@@ -23,7 +23,6 @@ class _FixtureFieldState extends State<FixtureField> {
   @override
   void initState() {
     super.initState();
-    _controller.initialize(10, 10);
     _initFixtures();
   }
 

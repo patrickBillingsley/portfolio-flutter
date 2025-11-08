@@ -33,12 +33,28 @@ class Fixture extends ChangeNotifier {
     Color? color,
     double? zoom,
   }) {
-    _center = center ?? _center;
-    _radius = radius ?? _radius;
-    _color = color ?? _color;
-    _zoom = zoom ?? _zoom;
+    var hasChanged = false;
 
-    notifyListeners();
+    if (center != null && center != _center) {
+      _center = center;
+      hasChanged = true;
+    }
+    if (radius != null && radius != _radius) {
+      _radius = radius;
+      hasChanged = true;
+    }
+    if (color != null && color != _color) {
+      _color = color;
+      hasChanged = true;
+    }
+    if (zoom != null && zoom != _zoom) {
+      _zoom = zoom;
+      hasChanged = true;
+    }
+
+    if (hasChanged) {
+      notifyListeners();
+    }
   }
 
   @override

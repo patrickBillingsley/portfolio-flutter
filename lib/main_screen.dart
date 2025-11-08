@@ -11,12 +11,28 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
-  late final FixtureController _fixtureController = FixtureController(vsync: this, lowerBound: 0.5, upperBound: 2.0, value: 1.0);
+  late final FixtureController _fixtureController = FixtureController(
+    vsync: this,
+    lowerBound: 0.5,
+    upperBound: 2.0,
+    value: 1.0,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _fixtureController.addListener(_refresh);
+  }
 
   @override
   void dispose() {
+    _fixtureController.removeListener(_refresh);
     _fixtureController.dispose();
     super.dispose();
+  }
+
+  void _refresh() {
+    setState(() {});
   }
 
   @override
