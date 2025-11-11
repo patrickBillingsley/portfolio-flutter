@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class Fixture extends ChangeNotifier {
   final int col;
   final int row;
+  Offset _originCenter;
   Offset _center;
   double _radius;
   Color _color;
   double _zoom;
 
+  Offset get originCenter => _originCenter;
   Offset get center => _center;
   double get radius => _radius;
   Color get color => _color;
@@ -20,7 +22,8 @@ class Fixture extends ChangeNotifier {
     double radius = 100,
     Color color = Colors.red,
     double zoom = 1.0,
-  }) : _center = center,
+  }) : _originCenter = center,
+       _center = center,
        _radius = radius,
        _color = color,
        _zoom = zoom;
@@ -28,12 +31,17 @@ class Fixture extends ChangeNotifier {
   Key get key => Key('fixture_${col}_$row');
 
   void update({
+    Offset? origin,
     Offset? center,
     double? radius,
     Color? color,
     double? zoom,
   }) {
     var hasChanged = false;
+
+    if (origin != null && origin != originCenter) {
+      _originCenter = origin;
+    }
 
     if (center != null && center != _center) {
       _center = center;

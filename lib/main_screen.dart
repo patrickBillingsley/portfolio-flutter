@@ -11,12 +11,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
-  late final FixtureController _fixtureController = FixtureController(
-    vsync: this,
-    lowerBound: 0.5,
-    upperBound: 2.0,
-    value: 1.0,
-  );
+  late final FixtureController _fixtureController = FixtureController(vsync: this);
 
   @override
   void initState() {
@@ -63,7 +58,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                   if (_fixtureController.isAnimating) {
                     _fixtureController.stop();
                   } else {
-                    _fixtureController.pulse();
+                    _fixtureController.pulse(duration: const Duration(minutes: 10));
                   }
                 },
                 style: FilledButton.styleFrom(

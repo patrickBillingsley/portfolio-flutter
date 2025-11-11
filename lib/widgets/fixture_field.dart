@@ -46,6 +46,7 @@ class _FixtureFieldState extends State<FixtureField> {
     for (final fixture in _fixtures) {
       final offset = initialOffset + Offset(cellWidth * fixture.col, cellWidth * fixture.row);
       fixture.update(
+        origin: offset,
         center: offset,
         radius: cellWidth * 0.5,
       );

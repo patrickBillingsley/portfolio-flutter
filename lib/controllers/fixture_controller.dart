@@ -31,6 +31,7 @@ class FixtureController with ChangeNotifier {
     for (var row = 0; row < rows; row++) {
       _fixtures.add(List<Fixture?>.filled(cols, null));
     }
+    _animation.addListener(_pulse);
   }
 
   double get value => _animation.value;
@@ -38,6 +39,7 @@ class FixtureController with ChangeNotifier {
 
   @override
   void dispose() {
+    _animation.removeListener(_pulse);
     _animation.dispose();
     super.dispose();
   }
@@ -48,52 +50,59 @@ class FixtureController with ChangeNotifier {
 
   void stop({bool canceled = true}) {
     _animation.stop();
-    for (final fixture in fixtures) {
-      fixture.update(zoom: 1.0);
-    }
     notifyListeners();
   }
 
+  void reset() {}
+
   void pulse({
-    Duration duration = const Duration(seconds: 5),
+    Duration duration = const Duration(seconds: 120),
     double min = 0.5,
     double max = 1.0,
     Color colorMin = Colors.blue,
-    Color colorMax = Colors.red,
+    Color colorMax = Colors.cyanAccent,
   }) {
-    _animation.addListener(() {
-      final timeInSeconds = (_animation.lastElapsedDuration?.inMilliseconds ?? 0) / 1000.0;
-      for (var i = 0; i < fixtures.length; i++) {
-        final sineWave = SineWaveGenerator(phase: 90 * (i + 1));
-        final normalizedValue = sineWave.getNormalizedValue(timeInSeconds, min: min, max: max);
-        fixtures[i].update(
-          zoom: normalizedValue,
-          color: Color.lerp(colorMin, colorMax, sineWave.getNormalizedValue(timeInSeconds)),
-        );
-      }
-    });
     _animation.repeat(min: min, max: max, reverse: true, period: duration);
     notifyListeners();
   }
-}
 
-class SineWaveGenerator {
-  double frequency;
-  double amplitude;
-  double phase;
-
-  SineWaveGenerator({
-    this.frequency = 1.0,
-    this.amplitude = 1.0,
-    this.phase = 90.0,
-  });
-
-  double getValue(double time) {
-    return amplitude * sin(2 * pi * frequency * time + phase);
-  }
-
-  double getNormalizedValue(double time, {double min = 0.0, double max = 1.0}) {
-    final normalizedValue = (getValue(time) + amplitude) / (2 * amplitude);
-    return min + normalizedValue * (max - min);
+  void _pulse() {
+    // final timeInSeconds = (_animation.lastElapsedDuration?.inMilliseconds ?? 0) / 1000.0;
+    for (var i = 0; i < fixtures.length; i++) {
+      final fixture = fixtures[i];
+      // final sineWave = SineWaveGenerator(phase: 90 * (i + 1));
+      final normalizedValue = sin(2 * pi * i * _animation.value);
+      final newOffset = Offset(fixture.originCenter.dx * normalizedValue, fixture.originCenter.dy * normalizedValue);
+      fixture.update(
+        center: newOffset,
+        zoom: normalizedValue,
+        color: Color.lerp(
+          (_animation.value > 0.5 ? Colors.blue : Colors.green),
+          (_animation.value > 0.3 ? Colors.orange : Colors.purple),
+          normalizedValue,
+        ),
+      );
+    }
   }
 }
+
+// class SineWaveGenerator {
+//   double frequency;
+//   double amplitude;
+//   double phase;
+
+//   SineWaveGenerator({
+//     this.frequency = 1.0,
+//     this.amplitude = 1.0,
+//     this.phase = 90.0,
+//   });
+
+//   double getValue(double time) {
+//     return amplitude * sin(2 * pi * frequency * time + phase);
+//   }
+
+//   double getNormalizedValue(double time, {double min = 0.0, double max = 1.0}) {
+//     final normalizedValue = (getValue(time) + amplitude) / (2 * amplitude);
+//     return min + normalizedValue * (max - min);
+//   }
+// }
