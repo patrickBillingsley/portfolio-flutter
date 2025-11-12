@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 import 'package:patrick_billingsley_portfolio/widgets/fixture_widget.dart';
+import 'package:patrick_billingsley_portfolio/widgets/keyboard_controller.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -10,12 +11,18 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> {
   int _sceneIndex = 0;
 
   List<Fixture> get _currentScene => _scenes[_sceneIndex];
 
   final List<List<Fixture>> _scenes = [
+    List.generate(100, (index) {
+      return Fixture(
+        key: Key('fixture_$index'),
+        color: Colors.blueGrey,
+      );
+    }),
     List.generate(100, (index) {
       final key = Key('fixture_$index');
       return Fixture(
@@ -34,6 +41,17 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         color: Color.lerp(Colors.green, Colors.red, index / 100),
       );
     }),
+    List.generate(100, (index) {
+      final key = Key('fixture_$index');
+      return Fixture(
+        key: key,
+        color: index.isEven ? Colors.blue : Colors.blueGrey,
+        offset: Offset(
+          index.isEven ? -20 : 20,
+          index.isEven ? 25 : -25,
+        ),
+      );
+    }),
   ];
 
   void _nextScene() {
@@ -48,35 +66,37 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black87,
-      body: Stack(
-        children: [
-          GridView.count(
-            crossAxisCount: 10,
-            padding: const EdgeInsets.all(12),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: [
-              ..._currentScene.map(FixtureWidget.new),
-            ],
-          ),
-          Positioned(
-            width: 200,
-            height: 200,
-            bottom: 16,
-            right: 16,
-            child: FilledButton(
-              onPressed: _nextScene,
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(16),
-                ),
-              ),
-              child: Text('Tap'),
+    return KeyboardController(
+      child: Scaffold(
+        backgroundColor: Colors.black87,
+        body: Stack(
+          children: [
+            GridView.count(
+              crossAxisCount: 10,
+              padding: const EdgeInsets.all(12),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              children: [
+                ..._currentScene.map(FixtureWidget.new),
+              ],
             ),
-          ),
-        ],
+            Positioned(
+              width: 200,
+              height: 200,
+              bottom: 16,
+              right: 16,
+              child: FilledButton(
+                onPressed: _nextScene,
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(16),
+                  ),
+                ),
+                child: Text('Tap'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

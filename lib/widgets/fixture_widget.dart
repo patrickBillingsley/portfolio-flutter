@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 
 class FixtureWidget extends StatefulWidget {
@@ -21,6 +22,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   );
 
   late final StreamSubscription<Fixture> _subscription;
+  late final StreamSubscription<Message> _messageSubscription;
 
   late Fixture _fixture = widget.fixture;
   late Fixture _previousFixture = widget.fixture;
@@ -29,6 +31,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   void initState() {
     super.initState();
     _subscription = widget.fixture.stream.listen(_setFixture);
+    _messageSubscription = FixtureBloc().messageStream.listen(_handleMessage);
     _positionController.addListener(() => setState(() {}));
   }
 
@@ -36,6 +39,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   void dispose() {
     super.dispose();
     _subscription.cancel();
+    _messageSubscription.cancel();
     _positionController.removeListener(() => setState(() {}));
   }
 
@@ -53,15 +57,20 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     _positionController.forward(from: 0);
   }
 
-  void _updateFixture() {
-    final color = _fixture.color == Colors.red ? Colors.green : Colors.red;
+  void _handleMessage(Message message) {
+    if (message is MoveMessage) {
+      _updateFixture(offset: _fixture.offset + message.offset);
+    }
+  }
 
-    setState(() {
-      _fixture = _fixture.copyWith(
+  void _updateFixture({Offset? offset, Color? color}) {
+    _setFixture(
+      _fixture.copyWith(
         color: color,
         animationDuration: Duration(milliseconds: 100),
-      );
-    });
+        offset: offset,
+      ),
+    );
   }
 
   @override
