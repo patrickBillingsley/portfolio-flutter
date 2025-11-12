@@ -43,6 +43,11 @@ class Fixture extends Object {
     );
   }
 
+  double calculateZoomFrom(Fixture from, {required Animation<double> controller}) {
+    final tween = Tween<double>(begin: from.zoom, end: zoom);
+    return tween.evaluate(controller);
+  }
+
   Fixture copyWith({
     int? id,
     Color? color,

@@ -16,7 +16,7 @@ class FixtureWidget extends StatefulWidget {
 }
 
 class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProviderStateMixin {
-  late final AnimationController _positionController = AnimationController(
+  late final AnimationController _animationController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 500),
   );
@@ -32,7 +32,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     super.initState();
     _subscription = widget.fixture.stream.listen(_setFixture);
     _messageSubscription = FixtureBloc().messageStream.listen(_handleMessage);
-    _positionController.addListener(() => setState(() {}));
+    _animationController.addListener(() => setState(() {}));
   }
 
   @override
@@ -40,7 +40,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     super.dispose();
     _subscription.cancel();
     _messageSubscription.cancel();
-    _positionController.removeListener(() => setState(() {}));
+    _animationController.removeListener(() => setState(() {}));
   }
 
   void _setFixture(Fixture nextFixture) {
@@ -48,13 +48,13 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
       _previousFixture = _fixture.copyWith(
         offset: _fixture.calculateOffsetFrom(
           _previousFixture,
-          controller: _positionController,
+          controller: _animationController,
         ),
       );
       _fixture = nextFixture;
     });
 
-    _positionController.forward(from: 0);
+    _animationController.forward(from: 0);
   }
 
   void _handleMessage(Message message) {
@@ -62,19 +62,19 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
       return;
     }
 
-    if (message is MoveMessage) {
-      _updateFixture(offset: _fixture.offset + message.position);
+    final Fixture? update;
+    switch (message) {
+      case MoveMessage _:
+        update = _fixture.copyWith(offset: _fixture.offset + message.position);
+      case ZoomMessage _:
+        update = _fixture.copyWith(zoom: message.zoom);
+      default:
+        update = null;
     }
-  }
 
-  void _updateFixture({Offset? offset, Color? color}) {
-    _setFixture(
-      _fixture.copyWith(
-        offset: offset,
-        color: color,
-        animationDuration: Duration(milliseconds: 100),
-      ),
-    );
+    if (update != null) {
+      _setFixture(update);
+    }
   }
 
   @override
@@ -82,18 +82,23 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     return Transform.translate(
       offset: _fixture.calculateOffsetFrom(
         _previousFixture,
-        controller: _positionController,
+        controller: _animationController,
       ),
-      child: GestureDetector(
-        onTap: _updateFixture,
-        child: AnimatedContainer(
-          duration: _fixture.animationDuration,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _fixture.color,
+      child: Transform.scale(
+        scale: _fixture.calculateZoomFrom(
+          _previousFixture,
+          controller: _animationController,
+        ),
+        child: GestureDetector(
+          child: AnimatedContainer(
+            duration: _fixture.animationDuration,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _fixture.color,
+            ),
+            alignment: Alignment.center,
+            // child: Text(_fixture.zoom.toString()),
           ),
-          alignment: Alignment.center,
-          child: Text(_fixture.id.toString()),
         ),
       ),
     );

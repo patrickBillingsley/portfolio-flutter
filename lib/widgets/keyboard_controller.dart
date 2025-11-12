@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
@@ -17,8 +19,9 @@ class KeyboardController extends StatefulWidget {
 class _KeyboardControllerState extends State<KeyboardController> {
   final FocusNode _focus = FocusNode();
 
-  int _interleave = 0;
+  int _interleave = 1;
   int _offset = 0;
+  double _zoom = 1.0;
 
   void _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
@@ -35,16 +38,26 @@ class _KeyboardControllerState extends State<KeyboardController> {
     }
   }
 
-  void _onInterleaveChanged(double interleaveString) {
+  void _onInterleaveChanged(int interleave) {
     setState(() {
-      _interleave = interleaveString.toInt();
+      _interleave = interleave;
+      if (_offset > interleave) {
+        _offset = _interleave;
+      }
     });
   }
 
-  void _onOffsetChanged(double offset) {
+  void _onOffsetChanged(int offset) {
     setState(() {
-      _offset = offset.toInt();
+      _offset = offset;
     });
+  }
+
+  void _onZoomChanged(double zoom) {
+    setState(() {
+      _zoom = zoom;
+    });
+    FixtureBloc().zoom(_zoom, interleave: _interleave, offset: _offset);
   }
 
   @override
@@ -67,42 +80,23 @@ class _KeyboardControllerState extends State<KeyboardController> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      children: [
-                        Text(
-                          'Interleave',
-                          style: Theme.of(context).primaryTextTheme.labelLarge,
-                        ),
-                        Slider(
-                          value: _interleave.toDouble(),
-                          min: 1,
-                          max: 10,
-                          divisions: 8,
-                          onChanged: _onInterleaveChanged,
-                        ),
-                        Text(
-                          _interleave.toString(),
-                          style: Theme.of(context).primaryTextTheme.labelLarge,
-                        ),
-                      ],
+                    ControlSlider<int>(
+                      onChanged: _onInterleaveChanged,
+                      label: 'Interleave',
+                      min: 1,
+                      value: _interleave,
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          'Offset',
-                          style: Theme.of(context).primaryTextTheme.labelLarge,
-                        ),
-                        Slider(
-                          value: _offset.toDouble(),
-                          max: 10,
-                          divisions: 9,
-                          onChanged: _onOffsetChanged,
-                        ),
-                        Text(
-                          _offset.toString(),
-                          style: Theme.of(context).primaryTextTheme.labelLarge,
-                        ),
-                      ],
+                    ControlSlider<int>(
+                      onChanged: _onOffsetChanged,
+                      label: 'Offset',
+                      max: _interleave,
+                      value: _offset,
+                    ),
+                    ControlSlider<double>(
+                      onChanged: _onZoomChanged,
+                      label: 'Zoom',
+                      max: 3.0,
+                      value: _zoom,
                     ),
                     Spacer(),
                     FilledButton(
@@ -122,6 +116,67 @@ class _KeyboardControllerState extends State<KeyboardController> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ControlSlider<T extends num> extends StatelessWidget {
+  final Function(T)? onChanged;
+  final String label;
+  final T min;
+  final T max;
+  final T value;
+
+  ControlSlider({
+    super.key,
+    this.onChanged,
+    this.label = '',
+    T? min,
+    T? max,
+    T? value,
+  }) : min = min ?? 0 as T,
+       max = max ?? 10 as T,
+       value = math.max(min ?? 0 as T, value ?? 0 as T);
+
+  int? get divisions {
+    switch (T) {
+      case const (int):
+        return (max - min).toInt();
+      case const (double):
+      default:
+        return null;
+    }
+  }
+
+  void _onChanged(double value) {
+    switch (T) {
+      case const (int):
+        onChanged?.call(value.toInt() as T);
+      case const (double):
+        onChanged?.call(double.parse(value.toStringAsFixed(2)) as T);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).primaryTextTheme.labelLarge,
+        ),
+        Slider(
+          onChanged: _onChanged,
+          min: min.toDouble(),
+          max: max.toDouble(),
+          divisions: divisions,
+          value: value.toDouble(),
+        ),
+        Text(
+          value.toString(),
+          style: Theme.of(context).primaryTextTheme.labelLarge,
+        ),
+      ],
     );
   }
 }

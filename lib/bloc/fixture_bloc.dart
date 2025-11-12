@@ -50,6 +50,16 @@ class FixtureBloc {
       ),
     );
   }
+
+  void zoom(double zoom, {int? interleave, int? offset}) {
+    _messageSubject.sink.add(
+      ZoomMessage(
+        zoom,
+        interleave: interleave,
+        offset: offset,
+      ),
+    );
+  }
 }
 
 abstract class Message {
@@ -79,6 +89,16 @@ class MoveMessage extends Message {
 
   const MoveMessage(
     this.position, {
+    super.interleave,
+    super.offset,
+  });
+}
+
+class ZoomMessage extends Message {
+  final double zoom;
+
+  const ZoomMessage(
+    this.zoom, {
     super.interleave,
     super.offset,
   });
