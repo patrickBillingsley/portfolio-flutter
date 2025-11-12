@@ -9,7 +9,18 @@ class Fixture extends Object {
   final Key? key;
   final Color? color;
   final double zoom;
+
   final Offset offset;
+  Offset calculateOffsetFrom(Fixture from, {required Animation<double> controller}) {
+    final xTween = Tween<double>(begin: from.offset.dx, end: offset.dx);
+    final yTween = Tween<double>(begin: from.offset.dy, end: offset.dy);
+
+    return Offset(
+      xTween.evaluate(controller),
+      yTween.evaluate(controller),
+    );
+  }
+
   final Duration animationDuration;
 
   const Fixture({

@@ -22,18 +22,5 @@ class FixtureBloc {
 
   void push(List<Fixture> fixtures) {
     fixtures.forEach(_subject.sink.add);
-
-    // for (var i = 0; i < 100; i++) {
-    //   final key = Key('fixture_$i');
-    //   // final color = i < 50 ? Colors.red : Colors.blue;
-    //   final color = i % 3 == 0 ? Colors.green : Colors.red;
-
-    //   _subject.sink.add(
-    //     Fixture(
-    //       key: key,
-    //       color: color,
-    //     ),
-    //   );
-    // }
   }
 }

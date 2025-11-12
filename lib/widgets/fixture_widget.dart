@@ -15,14 +15,15 @@ class FixtureWidget extends StatefulWidget {
 }
 
 class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProviderStateMixin {
-  late final AnimationController _positionController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-  Tween<double> get _xTween => Tween(begin: _previousFixture?.offset.dx ?? 0, end: _fixture.offset.dx);
-  Tween<double> get _yTween => Tween(begin: _previousFixture?.offset.dy ?? 0, end: _fixture.offset.dy);
+  late final AnimationController _positionController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+  );
 
   late final StreamSubscription<Fixture> _subscription;
 
   late Fixture _fixture = widget.fixture;
-  Fixture? _previousFixture;
+  late Fixture _previousFixture = widget.fixture;
 
   @override
   void initState() {
@@ -40,7 +41,12 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
 
   void _setFixture(Fixture nextFixture) {
     setState(() {
-      _previousFixture = _fixture;
+      _previousFixture = _fixture.copyWith(
+        offset: _fixture.calculateOffsetFrom(
+          _previousFixture,
+          controller: _positionController,
+        ),
+      );
       _fixture = nextFixture;
     });
 
@@ -61,9 +67,9 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset: Offset(
-        _xTween.evaluate(_positionController),
-        _yTween.evaluate(_positionController),
+      offset: _fixture.calculateOffsetFrom(
+        _previousFixture,
+        controller: _positionController,
       ),
       child: GestureDetector(
         onTap: _updateFixture,
