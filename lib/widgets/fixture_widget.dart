@@ -58,17 +58,21 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   }
 
   void _handleMessage(Message message) {
+    if (!message.pertainsTo(_fixture)) {
+      return;
+    }
+
     if (message is MoveMessage) {
-      _updateFixture(offset: _fixture.offset + message.offset);
+      _updateFixture(offset: _fixture.offset + message.position);
     }
   }
 
   void _updateFixture({Offset? offset, Color? color}) {
     _setFixture(
       _fixture.copyWith(
+        offset: offset,
         color: color,
         animationDuration: Duration(milliseconds: 100),
-        offset: offset,
       ),
     );
   }
@@ -88,6 +92,8 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
             shape: BoxShape.circle,
             color: _fixture.color,
           ),
+          alignment: Alignment.center,
+          child: Text(_fixture.id.toString()),
         ),
       ),
     );
