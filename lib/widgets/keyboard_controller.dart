@@ -5,12 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 
 class KeyboardController extends StatefulWidget {
-  final Widget child;
-
-  const KeyboardController({
-    super.key,
-    required this.child,
-  });
+  const KeyboardController({super.key});
 
   @override
   State<KeyboardController> createState() => _KeyboardControllerState();
@@ -67,53 +62,43 @@ class _KeyboardControllerState extends State<KeyboardController> {
       focusNode: _focus,
       autofocus: true,
       child: Material(
-        child: Stack(
-          children: [
-            widget.child,
-            Positioned(
-              height: 200,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ControlSlider<int>(
-                      onChanged: _onInterleaveChanged,
-                      label: 'Interleave',
-                      min: 1,
-                      value: _interleave,
-                    ),
-                    ControlSlider<int>(
-                      onChanged: _onOffsetChanged,
-                      label: 'Offset',
-                      max: _interleave,
-                      value: _offset,
-                    ),
-                    ControlSlider<double>(
-                      onChanged: _onZoomChanged,
-                      label: 'Zoom',
-                      max: 3.0,
-                      value: _zoom,
-                    ),
-                    Spacer(),
-                    FilledButton(
-                      onPressed: FixtureBloc().nextScene,
-                      style: FilledButton.styleFrom(
-                        fixedSize: Size(100, 100),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(16),
-                        ),
-                      ),
-                      child: Text('Tap'),
-                    ),
-                  ],
-                ),
+        color: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ControlSlider<int>(
+                onChanged: _onInterleaveChanged,
+                label: 'Interleave',
+                min: 1,
+                value: _interleave,
               ),
-            ),
-          ],
+              ControlSlider<int>(
+                onChanged: _onOffsetChanged,
+                label: 'Offset',
+                max: _interleave,
+                value: _offset,
+              ),
+              ControlSlider<double>(
+                onChanged: _onZoomChanged,
+                label: 'Zoom',
+                max: 3.0,
+                value: _zoom,
+              ),
+              Spacer(),
+              FilledButton(
+                onPressed: FixtureBloc().nextScene,
+                style: FilledButton.styleFrom(
+                  fixedSize: Size(100, 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(16),
+                  ),
+                ),
+                child: Text('Tap'),
+              ),
+            ],
+          ),
         ),
       ),
     );

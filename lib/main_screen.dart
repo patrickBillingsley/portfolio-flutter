@@ -8,19 +8,28 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardController(
-      child: Scaffold(
-        backgroundColor: Colors.black87,
-        body: GridView.count(
+    return Stack(
+      children: [
+        Container(
+          color: Colors.black87,
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: KeyboardController(),
+        ),
+        GridView.count(
           crossAxisCount: 10,
           padding: const EdgeInsets.all(12),
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
+          shrinkWrap: true,
           children: [
             ...FixtureBloc().currentScene.map(FixtureWidget.new),
           ],
         ),
-      ),
+      ],
     );
   }
 }
