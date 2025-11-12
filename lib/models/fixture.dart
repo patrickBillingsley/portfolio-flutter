@@ -1,76 +1,40 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 
-class Fixture extends ChangeNotifier {
-  final int col;
-  final int row;
-  Offset _originCenter;
-  Offset _center;
-  double _radius;
-  Color _color;
-  double _zoom;
+class Fixture extends Object {
+  static const defaultAnimationDuration = Duration(seconds: 1);
 
-  Offset get originCenter => _originCenter;
-  Offset get center => _center;
-  double get radius => _radius;
-  Color get color => _color;
-  double get zoom => _zoom;
+  final Key? key;
+  final Color? color;
+  final double zoom;
+  final Offset offset;
+  final Duration animationDuration;
 
-  Fixture({
-    this.col = 0,
-    this.row = 0,
-    Offset center = Offset.zero,
-    double radius = 100,
-    Color color = Colors.red,
-    double zoom = 1.0,
-  }) : _originCenter = center,
-       _center = center,
-       _radius = radius,
-       _color = color,
-       _zoom = zoom;
+  const Fixture({
+    this.key,
+    this.color,
+    this.zoom = 1.0,
+    this.offset = Offset.zero,
+    this.animationDuration = defaultAnimationDuration,
+  });
 
-  Key get key => Key('fixture_${col}_$row');
+  Stream<Fixture> get stream => FixtureBloc().streamFor(key);
 
-  void update({
-    Offset? origin,
-    Offset? center,
-    double? radius,
+  Fixture copyWith({
+    Key? key,
     Color? color,
     double? zoom,
+    Offset? offset,
+    Duration? animationDuration,
   }) {
-    var hasChanged = false;
-
-    if (origin != null && origin != originCenter) {
-      _originCenter = origin;
-    }
-
-    if (center != null && center != _center) {
-      _center = center;
-      hasChanged = true;
-    }
-    if (radius != null && radius != _radius) {
-      _radius = radius;
-      hasChanged = true;
-    }
-    if (color != null && color != _color) {
-      _color = color;
-      hasChanged = true;
-    }
-    if (zoom != null && zoom != _zoom) {
-      _zoom = zoom;
-      hasChanged = true;
-    }
-
-    if (hasChanged) {
-      notifyListeners();
-    }
+    return Fixture(
+      key: key ?? this.key,
+      color: color ?? this.color,
+      zoom: zoom ?? this.zoom,
+      offset: offset ?? this.offset,
+      animationDuration: animationDuration ?? this.animationDuration,
+    );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Fixture && other.key == key;
-  }
-
-  @override
-  int get hashCode => key.hashCode;
 }

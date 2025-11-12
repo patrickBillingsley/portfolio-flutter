@@ -1,48 +1,78 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:patrick_billingsley_portfolio/controllers/fixture_controller.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 
 class FixtureWidget extends StatefulWidget {
-  final FixtureController controller;
   final Fixture fixture;
 
-  FixtureWidget({
-    required this.controller,
-    required this.fixture,
-  }) : super(key: fixture.key);
+  FixtureWidget(
+    this.fixture,
+  ) : super(key: fixture.key);
 
   @override
   State<FixtureWidget> createState() => _FixtureWidgetState();
 }
 
-class _FixtureWidgetState extends State<FixtureWidget> {
+class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProviderStateMixin {
+  late final AnimationController _positionController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+  Tween<double> get _xTween => Tween(begin: _previousFixture?.offset.dx ?? 0, end: _fixture.offset.dx);
+  Tween<double> get _yTween => Tween(begin: _previousFixture?.offset.dy ?? 0, end: _fixture.offset.dy);
+
+  late final StreamSubscription<Fixture> _subscription;
+
+  late Fixture _fixture = widget.fixture;
+  Fixture? _previousFixture;
+
   @override
   void initState() {
     super.initState();
-    widget.controller.register(widget.fixture);
-    widget.fixture.addListener(_refresh);
+    _subscription = widget.fixture.stream.listen(_setFixture);
+    _positionController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
-    widget.fixture.removeListener(_refresh);
     super.dispose();
+    _subscription.cancel();
+    _positionController.removeListener(() => setState(() {}));
   }
 
-  void _refresh() {
-    setState(() {});
+  void _setFixture(Fixture nextFixture) {
+    setState(() {
+      _previousFixture = _fixture;
+      _fixture = nextFixture;
+    });
+
+    _positionController.forward(from: 0);
+  }
+
+  void _updateFixture() {
+    final color = _fixture.color == Colors.red ? Colors.green : Colors.red;
+
+    setState(() {
+      _fixture = _fixture.copyWith(
+        color: color,
+        animationDuration: Duration(milliseconds: 100),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fromRect(
-      rect: Rect.fromCircle(
-        center: widget.fixture.center,
-        radius: widget.fixture.radius * widget.fixture.zoom,
+    return Transform.translate(
+      offset: Offset(
+        _xTween.evaluate(_positionController),
+        _yTween.evaluate(_positionController),
       ),
-      child: ClipOval(
-        child: Container(
-          color: widget.fixture.color,
+      child: GestureDetector(
+        onTap: _updateFixture,
+        child: AnimatedContainer(
+          duration: _fixture.animationDuration,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _fixture.color,
+          ),
         ),
       ),
     );
