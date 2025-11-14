@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
+import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
+import 'package:vector_math/vector_math.dart' hide Colors;
 
 class KeyboardController extends StatefulWidget {
   const KeyboardController({super.key});
@@ -22,13 +24,13 @@ class _KeyboardControllerState extends State<KeyboardController> {
     if (event is KeyDownEvent) {
       switch (event.logicalKey) {
         case LogicalKeyboardKey.arrowUp:
-          FixtureBloc().move(Offset(0, -10), interleave: _interleave, offset: _offset);
+          FixtureBloc().move(Vector3(0, -10, 0), interleave: _interleave, offset: _offset);
         case LogicalKeyboardKey.arrowDown:
-          FixtureBloc().move(Offset(0, 10), interleave: _interleave, offset: _offset);
+          FixtureBloc().move(Vector3(0, 10, 0), interleave: _interleave, offset: _offset);
         case LogicalKeyboardKey.arrowLeft:
-          FixtureBloc().move(Offset(-10, 0), interleave: _interleave, offset: _offset);
+          FixtureBloc().move(Vector3(-10, 0, 0), interleave: _interleave, offset: _offset);
         case LogicalKeyboardKey.arrowRight:
-          FixtureBloc().move(Offset(10, 0), interleave: _interleave, offset: _offset);
+          FixtureBloc().move(Vector3(10, 0, 0), interleave: _interleave, offset: _offset);
       }
     }
   }
@@ -62,7 +64,7 @@ class _KeyboardControllerState extends State<KeyboardController> {
       focusNode: _focus,
       autofocus: true,
       child: Material(
-        color: Colors.transparent,
+        color: Colors.black12,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -85,6 +87,25 @@ class _KeyboardControllerState extends State<KeyboardController> {
                 label: 'Zoom',
                 max: 3.0,
                 value: _zoom,
+              ),
+              StreamBuilder<Offset>(
+                stream: ScrollService().offsetStream,
+                builder: (context, snapshot) {
+                  final offset = snapshot.data;
+
+                  return Column(
+                    children: [
+                      Text(
+                        'Scroll Offset',
+                        style: Theme.of(context).primaryTextTheme.labelLarge,
+                      ),
+                      Text(
+                        'x: ${offset?.dx ?? '?'} y: ${offset?.dy ?? '?'}',
+                        style: Theme.of(context).primaryTextTheme.labelLarge,
+                      ),
+                    ],
+                  );
+                },
               ),
               Spacer(),
               FilledButton(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:vector_math/vector_math.dart';
 
 class FixtureBloc {
   static FixtureBloc? _instance;
@@ -41,7 +42,7 @@ class FixtureBloc {
     push(scenes[_sceneIndex]);
   }
 
-  void move(Offset position, {int? interleave, int? offset}) {
+  void move(Vector3 position, {int? interleave, int? offset}) {
     _messageSubject.sink.add(
       MoveMessage(
         position,
@@ -85,7 +86,7 @@ abstract class Message {
 }
 
 class MoveMessage extends Message {
-  final Offset position;
+  final Vector3 position;
 
   const MoveMessage(
     this.position, {

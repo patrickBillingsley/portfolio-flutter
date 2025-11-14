@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 import 'package:patrick_billingsley_portfolio/main_screen.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
+import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
+import 'package:vector_math/vector_math.dart' hide Colors;
 
 final scenes = [
   List.generate(100, (index) {
@@ -14,9 +16,10 @@ final scenes = [
     return Fixture(
       id: index,
       color: index % 3 == 0 ? Colors.green : Colors.red,
-      offset: Offset(
+      position: Vector3(
         index % 3 == 0 ? 100 : 0,
         index % 3 == 0 ? 10 : 0,
+        index % 3 == 0 ? 30 : -60,
       ),
     );
   }),
@@ -30,8 +33,9 @@ final scenes = [
     return Fixture(
       id: index,
       color: index.isEven ? Colors.blue : Colors.blueGrey,
-      offset: Offset(
+      position: Vector3(
         index.isEven ? -20 : 20,
+        index.isEven ? 25 : -25,
         index.isEven ? 25 : -25,
       ),
     );
@@ -51,7 +55,10 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(),
+      home: Listener(
+        onPointerSignal: ScrollService().updateScrollOffset,
+        child: MainScreen(),
+      ),
     );
   }
 }

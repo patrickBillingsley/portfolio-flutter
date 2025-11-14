@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 class FixtureWidget extends StatefulWidget {
   final Fixture fixture;
@@ -46,7 +47,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
   void _setFixture(Fixture nextFixture) {
     setState(() {
       _previousFixture = _fixture.copyWith(
-        offset: _fixture.calculateOffsetFrom(
+        position: _fixture.calculatePositionFrom(
           _previousFixture,
           controller: _animationController,
         ),
@@ -65,7 +66,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     final Fixture? update;
     switch (message) {
       case MoveMessage _:
-        update = _fixture.copyWith(offset: _fixture.offset + message.position);
+        update = _fixture.copyWith(position: _fixture.position + message.position);
       case ZoomMessage _:
         update = _fixture.copyWith(zoom: message.zoom);
       default:
@@ -79,11 +80,12 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: _fixture.calculateOffsetFrom(
-        _previousFixture,
-        controller: _animationController,
-      ),
+    final position = _fixture.calculatePositionFrom(_previousFixture, controller: _animationController);
+    return Transform(
+      transform: Matrix4.identity()
+        ..translateByVector3(
+          Vector3(position.x, position.y, position.z),
+        ),
       child: Transform.scale(
         scale: _fixture.calculateZoomFrom(
           _previousFixture,
