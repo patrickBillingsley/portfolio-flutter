@@ -7,7 +7,12 @@ import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
 class KeyboardController extends StatefulWidget {
-  const KeyboardController({super.key});
+  final VoidCallback? onTap;
+
+  const KeyboardController({
+    super.key,
+    this.onTap,
+  });
 
   @override
   State<KeyboardController> createState() => _KeyboardControllerState();
@@ -109,7 +114,7 @@ class _KeyboardControllerState extends State<KeyboardController> {
               ),
               Spacer(),
               FilledButton(
-                onPressed: FixtureBloc().nextScene,
+                onPressed: widget.onTap,
                 style: FilledButton.styleFrom(
                   fixedSize: Size(100, 100),
                   shape: RoundedRectangleBorder(
@@ -117,6 +122,17 @@ class _KeyboardControllerState extends State<KeyboardController> {
                   ),
                 ),
                 child: Text('Tap'),
+              ),
+              const SizedBox(width: 16),
+              FilledButton(
+                onPressed: FixtureBloc().nextScene,
+                style: FilledButton.styleFrom(
+                  fixedSize: Size(100, 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(16),
+                  ),
+                ),
+                child: Text('Scene'),
               ),
             ],
           ),

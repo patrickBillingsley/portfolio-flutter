@@ -15,7 +15,12 @@ class ScrollService {
 
   void updateScrollOffset(PointerSignalEvent event) {
     if (event is PointerScrollEvent) {
-      _offsetSubject.add(_offsetSubject.value + event.scrollDelta);
+      _offsetSubject.add(
+        Offset(
+          _offsetSubject.value.dx + event.scrollDelta.dx,
+          _offsetSubject.value.dy + event.scrollDelta.dy,
+        ),
+      );
     }
   }
 }
