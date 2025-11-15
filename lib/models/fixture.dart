@@ -12,6 +12,7 @@ class Fixture extends Object {
   final double zoom;
   final Vector3 position;
   final Duration animationDuration;
+  final double borderRadius;
 
   Fixture({
     this.id,
@@ -19,6 +20,7 @@ class Fixture extends Object {
     this.zoom = 1.0,
     Vector3? position,
     this.animationDuration = defaultAnimationDuration,
+    this.borderRadius = 0,
   }) : position = position ?? Vector3.zero();
 
   Key? get key => id == null ? null : Key('fixture_$id');
@@ -53,6 +55,7 @@ class Fixture extends Object {
     double? zoom,
     Vector3? position,
     Duration? animationDuration,
+    double? borderRadius,
   }) {
     return Fixture(
       id: id ?? this.id,
@@ -60,6 +63,7 @@ class Fixture extends Object {
       zoom: zoom ?? this.zoom,
       position: position ?? this.position,
       animationDuration: animationDuration ?? this.animationDuration,
+      borderRadius: borderRadius ?? this.borderRadius,
     );
   }
 }

@@ -92,10 +92,18 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
           controller: _animationController,
         ),
         child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            FixtureBloc().push([
+              _fixture.copyWith(
+                borderRadius: _fixture.borderRadius == 0 ? 50 : 0,
+              ),
+            ]);
+          },
           child: AnimatedContainer(
             duration: _fixture.animationDuration,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(_fixture.borderRadius),
               color: _fixture.color,
             ),
             alignment: Alignment.center,
