@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/bloc/fixture_bloc.dart';
-import 'package:patrick_billingsley_portfolio/main_screen.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
+import 'package:patrick_billingsley_portfolio/screens/home_screen.dart';
 import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
@@ -55,9 +55,19 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Listener(
-        onPointerSignal: ScrollService().updateScrollOffset,
-        child: MainScreen(),
+      home: Theme(
+        data: ThemeData(
+          scaffoldBackgroundColor: Colors.blueGrey.shade900,
+          textTheme: TextTheme(
+            bodyMedium: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+        ),
+        child: Listener(
+          onPointerSignal: ScrollService().updateScrollOffset,
+          child: HomeScreen(),
+        ),
       ),
     );
   }
