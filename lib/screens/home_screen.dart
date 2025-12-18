@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:patrick_billingsley_portfolio/widgets/fixture_grid.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,104 +8,89 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  late final ScrollController _scrollController = ScrollController(initialScrollOffset: center);
-
-  int itemCount = 5;
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  int maxIndex = 4;
   int selectedIndex = 2;
+  int indexOffset = -2;
 
-  Size get availableSpace => MediaQuery.sizeOf(context);
-  double get containerHeight => availableSpace.height;
-  double get containerWidth => availableSpace.width * 0.7;
-
-  double get center => scrollOffsetFor(2);
-
-  double scrollOffsetFor(int index) {
-    final leftEdge = containerWidth * index;
-    return leftEdge - (availableSpace.width * 0.15);
-  }
-
-  void _nextIndex() {
-    if (selectedIndex >= itemCount) return;
-
-    _scrollController.animateTo(
-      scrollOffsetFor(++selectedIndex),
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _lastIndex() {
+  void _turnRight() {
     if (selectedIndex <= 0) return;
 
-    _scrollController.animateTo(
-      scrollOffsetFor(--selectedIndex),
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-    );
+    setState(() {
+      selectedIndex--;
+      indexOffset--;
+    });
   }
+
+  void _turnLeft() {
+    if (selectedIndex >= maxIndex) return;
+
+    setState(() {
+      selectedIndex++;
+      indexOffset++;
+    });
+  }
+
+  Matrix4 transformFor(int index) {
+    final factor = 0.8;
+
+    return Matrix4.identity()
+      ..setEntry(3, 2, 0.001)
+      ..rotateY(factor * index)
+      ..translateByVector3(Vector3(0, 0, 1000));
+  }
+
+  final List<Color> _colors = const [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              itemExtent: containerWidth,
-              itemCount: itemCount,
-              itemBuilder: (_, index) {
-                final showGrid = index == 2;
+    final space = MediaQuery.sizeOf(context);
 
-                return Container(
-                  height: containerHeight,
-                  width: containerWidth,
-                  color: index.isEven ? Colors.blueGrey.shade900 : Colors.grey.shade900,
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: showGrid ? FixtureGrid() : Text('Hello'),
-                      ),
-                    ],
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        ...List.generate(5, (index) {
+          return Portal(
+            index: index + indexOffset,
+            color: _colors[index],
+          );
+        }),
+        Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ClipPath(
+                clipper: LeftClipper(),
+                child: GestureDetector(
+                  onTap: _turnLeft,
+                  child: Container(
+                    width: space.width * 0.05,
+                    height: space.width * 0.1,
+                    color: Colors.amber,
                   ),
-                );
-              },
-            ),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ClipPath(
-                    clipper: LeftClipper(),
-                    child: GestureDetector(
-                      onTap: _lastIndex,
-                      child: Container(
-                        width: availableSpace.width * 0.05,
-                        height: availableSpace.width * 0.1,
-                        color: Colors.amber,
-                      ),
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: RightClipper(),
-                    child: GestureDetector(
-                      onTap: _nextIndex,
-                      child: Container(
-                        width: availableSpace.width * 0.05,
-                        height: availableSpace.width * 0.1,
-                        color: Colors.amber,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              ClipPath(
+                clipper: RightClipper(),
+                child: GestureDetector(
+                  onTap: _turnRight,
+                  child: Container(
+                    width: space.width * 0.05,
+                    height: space.width * 0.1,
+                    color: Colors.amber,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -143,5 +128,91 @@ class RightClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
     return false;
+  }
+}
+
+class Portal extends StatefulWidget {
+  final int index;
+  final Color color;
+
+  const Portal({
+    super.key,
+    required this.index,
+    this.color = Colors.red,
+  });
+
+  @override
+  State<Portal> createState() => _PortalState();
+}
+
+class _PortalState extends State<Portal> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  );
+
+  late final Animation<double> _curvedAnimation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeInOut,
+  );
+
+  late Tween<double> _tween = Tween(
+    begin: _rotationFor(widget.index),
+    end: _rotationFor(widget.index),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(Portal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.index != oldWidget.index) {
+      _tween = Tween(
+        begin: _tween.evaluate(_curvedAnimation),
+        end: _rotationFor(widget.index),
+      );
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() {
+    setState(() {});
+  }
+
+  double _rotationFor(int index) {
+    final factor = 0.8;
+    return factor * index;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final space = MediaQuery.sizeOf(context);
+
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001)
+        ..rotateY(_tween.evaluate(_curvedAnimation))
+        ..translateByVector3(Vector3(0, 0, 1000)),
+      child: OverflowBox(
+        maxWidth: double.infinity,
+        maxHeight: double.infinity,
+        child: Container(
+          width: space.width,
+          height: space.height * 1.15,
+          color: widget.color,
+        ),
+      ),
+    );
   }
 }
