@@ -104,3 +104,16 @@ class ZoomMessage extends Message {
     super.offset,
   });
 }
+
+class SizeMessage extends Message {
+  final Size size;
+
+  double get width => size.width;
+  double get height => size.height;
+
+  const SizeMessage(
+    this.size, {
+    super.interleave,
+    super.offset,
+  });
+}

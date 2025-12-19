@@ -41,7 +41,7 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
     super.dispose();
     _subscription.cancel();
     _messageSubscription.cancel();
-    _animationController.removeListener(() => setState(() {}));
+    _animationController.dispose();
   }
 
   void _setFixture(Fixture nextFixture) {
@@ -65,10 +65,12 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
 
     final Fixture? update;
     switch (message) {
-      case MoveMessage _:
-        update = _fixture.copyWith(position: _fixture.position + message.position);
-      case ZoomMessage _:
-        update = _fixture.copyWith(zoom: message.zoom);
+      case MoveMessage(:final position):
+        update = _fixture.copyWith(position: _fixture.position + position);
+      case ZoomMessage(:final zoom):
+        update = _fixture.copyWith(zoom: zoom);
+      case SizeMessage(:final size):
+        update = _fixture.copyWith(size: size);
       default:
         update = null;
     }
@@ -102,12 +104,13 @@ class _FixtureWidgetState extends State<FixtureWidget> with SingleTickerProvider
           },
           child: AnimatedContainer(
             duration: _fixture.animationDuration,
+            width: _fixture.size.width,
+            height: _fixture.size.height,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(_fixture.borderRadius),
               color: _fixture.color,
             ),
             alignment: Alignment.center,
-            // child: Text(_fixture.zoom.toString()),
           ),
         ),
       ),

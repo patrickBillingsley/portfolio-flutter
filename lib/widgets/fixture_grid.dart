@@ -6,7 +6,12 @@ import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
 import 'package:patrick_billingsley_portfolio/widgets/fixture_widget.dart';
 
 class FixtureGrid extends StatefulWidget {
-  const FixtureGrid({super.key});
+  final int crossAxisCount;
+
+  const FixtureGrid({
+    super.key,
+    this.crossAxisCount = 10,
+  });
 
   @override
   State<FixtureGrid> createState() => _FixtureGridState();
@@ -35,17 +40,21 @@ class _FixtureGridState extends State<FixtureGrid> {
     });
   }
 
+  Matrix4 _calculateTransform() {
+    return Matrix4.identity()
+      ..setEntry(3, 2, 0.001)
+      ..rotateY(_scrollOffset.dx * 0.01)
+      ..rotateX(_scrollOffset.dy * 0.01);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Transform(
-        transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001)
-          ..rotateY(_scrollOffset.dx * 0.01)
-          ..rotateX(_scrollOffset.dy * 0.01),
+        transform: _calculateTransform(),
         alignment: FractionalOffset.center,
         child: GridView.count(
-          crossAxisCount: 10,
+          crossAxisCount: widget.crossAxisCount,
           padding: const EdgeInsets.all(12),
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,

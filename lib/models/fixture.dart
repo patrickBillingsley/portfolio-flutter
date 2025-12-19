@@ -9,19 +9,31 @@ class Fixture extends Object {
 
   final int? id;
   final Color? color;
+  final Size size;
   final double zoom;
   final Vector3 position;
   final Duration animationDuration;
   final double borderRadius;
 
+  double get width => size.width;
+  double get height => size.height;
+
   Fixture({
     this.id,
     this.color,
+    double? width,
+    double? height,
+    Size? size,
     this.zoom = 1.0,
     Vector3? position,
     this.animationDuration = defaultAnimationDuration,
     this.borderRadius = 0,
-  }) : position = position ?? Vector3.zero();
+  }) : position = position ?? Vector3.zero(),
+       // An explicit width or height take precedent over an explicit size.
+       size = Size(
+         width ?? size?.width ?? double.infinity,
+         height ?? size?.height ?? double.infinity,
+       );
 
   Key? get key => id == null ? null : Key('fixture_$id');
   Stream<Fixture> get stream => FixtureBloc().streamFor(key);
@@ -52,6 +64,9 @@ class Fixture extends Object {
   Fixture copyWith({
     int? id,
     Color? color,
+    double? width,
+    double? height,
+    Size? size,
     double? zoom,
     Vector3? position,
     Duration? animationDuration,
@@ -60,6 +75,11 @@ class Fixture extends Object {
     return Fixture(
       id: id ?? this.id,
       color: color ?? this.color,
+      // Width, height, and size are resolved in the constructor.
+      // An explicit width or height take precedent over an explicit size.
+      width: width,
+      height: height,
+      size: size ?? this.size,
       zoom: zoom ?? this.zoom,
       position: position ?? this.position,
       animationDuration: animationDuration ?? this.animationDuration,
