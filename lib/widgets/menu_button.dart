@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:patrick_billingsley_portfolio/models/case_study.dart';
+import 'package:patrick_billingsley_portfolio/screens/case_study_screen.dart';
 
 class MenuButton extends StatefulWidget {
   const MenuButton({super.key});
@@ -8,6 +10,8 @@ class MenuButton extends StatefulWidget {
 }
 
 class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateMixin {
+  static const double _buttonOffset = 60;
+
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 200),
@@ -41,14 +45,15 @@ class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      spacing: 36,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: _buttonOffset,
       children: [
         Transform.translate(
-          offset: Offset(0, 80 * (1 - _controller.value)),
+          offset: Offset(0, _buttonOffset * (1 - _controller.value)),
           child: Opacity(
             opacity: _controller.value,
             child: FilledButton(
-              onPressed: () {},
+              onPressed: _controller.value == 1.0 ? CaseStudyScreen(CaseStudy(fileName: 'messaging_migration')).show : null,
               child: Text('Case Studies'),
             ),
           ),
@@ -58,7 +63,7 @@ class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateM
           child: Text('Menu'),
         ),
         Transform.translate(
-          offset: Offset(0, -80 * (1 - _controller.value)),
+          offset: Offset(0, -_buttonOffset * (1 - _controller.value)),
           transformHitTests: false,
           child: Opacity(
             opacity: _controller.value,
