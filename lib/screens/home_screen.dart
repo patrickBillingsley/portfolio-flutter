@@ -8,113 +8,58 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  static const int maxIndex = 2;
-  static const int minIndex = -2;
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _rotationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+    lowerBound: -60,
+    upperBound: 60,
+  );
 
   int selectedIndex = 0;
 
-  void _turnRight() {
-    if (selectedIndex >= maxIndex) return;
+  double get degrees => _rotationController.value;
 
-    setState(() {
-      selectedIndex++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _rotationController.addListener(() => setState(() {}));
   }
 
-  void _turnLeft() {
-    if (selectedIndex <= minIndex) return;
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
 
+  void _selectIndex(int index) {
     setState(() {
-      selectedIndex--;
+      selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final space = MediaQuery.sizeOf(context);
-
     return Stack(
       clipBehavior: Clip.none,
       children: [
         ...List.generate(5, (index) {
-          return Portal(
-            key: ValueKey(index - 2),
-            index: index + selectedIndex - 2,
-            color: index.isOdd ? Colors.blueGrey : Colors.grey,
+          final normalizedIndex = index - 2;
+
+          return GestureDetector(
+            child: Portal(
+              key: ValueKey(normalizedIndex),
+              onTap: () => _selectIndex(-normalizedIndex),
+              index: normalizedIndex + selectedIndex,
+              color: normalizedIndex.isOdd ? Colors.blueGrey : Colors.grey,
+            ),
           );
         }),
-
         Portal(
           index: 0,
           color: Colors.blue,
         ),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ClipPath(
-                clipper: LeftClipper(),
-                child: GestureDetector(
-                  onTap: _turnLeft,
-                  child: Container(
-                    width: space.width * 0.05,
-                    height: space.width * 0.1,
-                    color: Colors.amber,
-                  ),
-                ),
-              ),
-              ClipPath(
-                clipper: RightClipper(),
-                child: GestureDetector(
-                  onTap: _turnRight,
-                  child: Container(
-                    width: space.width * 0.05,
-                    height: space.width * 0.1,
-                    color: Colors.amber,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
-  }
-}
-
-class LeftClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(0, 0)
-      ..arcToPoint(
-        Offset(0, size.height),
-        radius: Radius.circular(size.width),
-      )
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-class RightClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(size.width, size.height)
-      ..arcToPoint(
-        Offset(size.width, 0),
-        radius: Radius.circular(size.width),
-      )
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return false;
   }
 }
