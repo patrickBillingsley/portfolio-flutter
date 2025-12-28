@@ -1,65 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:patrick_billingsley_portfolio/widgets/portal.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatefulWidget {
+extension CustomColors on Colors {
+  static const MaterialColor matrixGreen = MaterialColor(_matrixGreenPrimaryValue, {
+    400: Color(0xFF00FF41),
+    500: Color(_matrixGreenPrimaryValue),
+    600: Color(0xFF003B00),
+  });
+  static const int _matrixGreenPrimaryValue = 0xFF008F11;
+
+  static const Color matrixBlack = Color(0xFF0D0208);
+}
+
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late final AnimationController _rotationController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 500),
-    lowerBound: -60,
-    upperBound: 60,
-  );
-
-  int selectedIndex = 0;
-
-  double get degrees => _rotationController.value;
-
-  @override
-  void initState() {
-    super.initState();
-    _rotationController.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _rotationController.dispose();
-    super.dispose();
-  }
-
-  void _selectIndex(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ...List.generate(5, (index) {
-          final normalizedIndex = index - 2;
-
-          return GestureDetector(
-            child: Portal(
-              key: ValueKey(normalizedIndex),
-              onTap: () => _selectIndex(-normalizedIndex),
-              index: normalizedIndex + selectedIndex,
-              color: normalizedIndex.isOdd ? Colors.blueGrey : Colors.grey,
-            ),
-          );
-        }),
-        Portal(
-          index: 0,
-          color: Colors.blue,
+    return Theme(
+      data: ThemeData(
+        scaffoldBackgroundColor: CustomColors.matrixBlack,
+        textTheme: TextTheme(
+          bodyMedium: GoogleFonts.courierPrime(
+            color: CustomColors.matrixGreen,
+          ),
         ),
-      ],
+      ),
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('Knock Knock, Neo'),
+        ),
+      ),
     );
   }
 }
