@@ -39,39 +39,36 @@ class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            top: -80 * _controller.value,
-            left: -60,
-            child: Opacity(
-              opacity: _controller.value,
-              child: FilledButton(
-                onPressed: () {},
-                child: Text('Case Studies'),
-              ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 36,
+      children: [
+        Transform.translate(
+          offset: Offset(0, 80 * (1 - _controller.value)),
+          child: Opacity(
+            opacity: _controller.value,
+            child: FilledButton(
+              onPressed: () {},
+              child: Text('Case Studies'),
             ),
           ),
-          Positioned(
-            bottom: -80 * _controller.value,
-            left: -30,
-            child: Opacity(
-              opacity: _controller.value,
-              child: FilledButton(
-                onPressed: () {},
-                child: Text('Contact'),
-              ),
+        ),
+        FilledButton(
+          onPressed: _toggleMenu,
+          child: Text('Menu'),
+        ),
+        Transform.translate(
+          offset: Offset(0, -80 * (1 - _controller.value)),
+          transformHitTests: false,
+          child: Opacity(
+            opacity: _controller.value,
+            child: FilledButton(
+              onPressed: () {},
+              child: Text('Contact'),
             ),
           ),
-          FilledButton(
-            onPressed: _toggleMenu,
-            child: Text('Menu'),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
