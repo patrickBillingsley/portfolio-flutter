@@ -13,6 +13,12 @@ class CaseStudy extends ChangeNotifier {
   String? _content;
   String get content => _content ?? '';
 
+  List<String> get sections {
+    if (_content == null) return [];
+
+    return RegExp(r'#+.*?(?=\n#|$)', dotAll: true).allMatches(content).map((m) => m.group(0)!).toList();
+  }
+
   bool get isLoading => _content == null;
 
   Future<void> _load() async {

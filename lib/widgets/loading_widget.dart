@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:patrick_billingsley_portfolio/models/case_study.dart';
 
-class LoadingWidget<T extends Object> extends StatelessWidget {
-  final ChangeNotifier listenable;
-  final T? value;
-  final Widget Function(T) builder;
+class LoadingWidget extends StatelessWidget {
+  final CaseStudy caseStudy;
+  final Widget Function(CaseStudy) builder;
 
   const LoadingWidget({
     super.key,
-    required this.listenable,
-    required this.value,
+    required this.caseStudy,
     required this.builder,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: listenable,
-      builder: (context, child) {
-        if (value == null) {
+      listenable: caseStudy,
+      builder: (_, _) {
+        if (caseStudy.isLoading) {
           return Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        return builder(value!);
+        return builder(caseStudy);
       },
     );
   }

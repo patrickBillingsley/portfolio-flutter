@@ -3,7 +3,7 @@ import 'package:patrick_billingsley_portfolio/mixins/navigation.dart';
 import 'package:patrick_billingsley_portfolio/models/case_study.dart';
 import 'package:patrick_billingsley_portfolio/widgets/loading_widget.dart';
 
-class CaseStudyScreen extends StatefulWidget with Navigation {
+class CaseStudyScreen extends StatelessWidget with Navigation {
   final CaseStudy caseStudy;
 
   const CaseStudyScreen(
@@ -12,23 +12,21 @@ class CaseStudyScreen extends StatefulWidget with Navigation {
   });
 
   @override
-  State<CaseStudyScreen> createState() => _CaseStudyScreenState();
-}
-
-class _CaseStudyScreenState extends State<CaseStudyScreen> {
-  late final CaseStudy _caseStudy = widget.caseStudy;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         minimum: const EdgeInsets.all(20),
-        child: LoadingWidget<String>(
-          listenable: _caseStudy,
-          value: _caseStudy.content,
-          builder: (content) {
+        child: LoadingWidget(
+          caseStudy: caseStudy,
+          builder: (caseStudy) {
             return SingleChildScrollView(
-              child: Text(content),
+              child: Column(
+                children: [
+                  ...caseStudy.sections.map((section) {
+                    return Text(section);
+                  }),
+                ],
+              ),
             );
           },
         ),
