@@ -22,6 +22,10 @@ class MainApp extends StatelessWidget with Navigation {
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        appBarTheme: AppBarThemeData(
+          backgroundColor: CustomColors.matrixBlack,
+          foregroundColor: CustomColors.matrixGreen,
+        ),
         scaffoldBackgroundColor: CustomColors.matrixBlack,
         filledButtonTheme: FilledButtonThemeData(
           style: ButtonStyle(

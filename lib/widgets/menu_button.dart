@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/models/case_study.dart';
 import 'package:patrick_billingsley_portfolio/screens/case_study_screen.dart';
+import 'package:patrick_billingsley_portfolio/screens/menu_screen.dart';
 
 class MenuButton extends StatefulWidget {
   const MenuButton({super.key});
@@ -53,7 +54,17 @@ class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateM
           child: Opacity(
             opacity: _controller.value,
             child: FilledButton(
-              onPressed: _controller.value == 1.0 ? CaseStudyScreen(CaseStudy(fileName: 'messaging_migration')).show : null,
+              onPressed: _controller.value == 1.0
+                  ? MenuScreen(
+                      title: 'Case Studies',
+                      options: [
+                        FilledButton(
+                          onPressed: CaseStudyScreen(CaseStudy(fileName: 'messaging_migration')).show,
+                          child: Text('Messaging'),
+                        ),
+                      ],
+                    ).show
+                  : null,
               child: Text('Case Studies'),
             ),
           ),

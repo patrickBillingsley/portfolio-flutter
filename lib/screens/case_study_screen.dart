@@ -58,6 +58,7 @@ class _CaseStudyScreenState extends State<CaseStudyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         minimum: const EdgeInsets.all(20),
         child: LoadingWidget(
@@ -66,13 +67,16 @@ class _CaseStudyScreenState extends State<CaseStudyScreen> {
             return Column(
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 8,
                   child: PageView.builder(
+                    physics: NeverScrollableScrollPhysics(),
                     controller: _controller,
                     itemCount: widget.caseStudy.sections.length,
                     itemBuilder: (context, index) {
-                      return Markdown(
-                        text: widget.caseStudy.sections[index],
+                      return SingleChildScrollView(
+                        child: Markdown(
+                          text: widget.caseStudy.sections[index],
+                        ),
                       );
                     },
                   ),
