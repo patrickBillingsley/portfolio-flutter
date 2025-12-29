@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/mixins/navigation.dart';
 import 'package:patrick_billingsley_portfolio/models/case_study.dart';
 import 'package:patrick_billingsley_portfolio/widgets/loading_widget.dart';
+import 'package:patrick_billingsley_portfolio/widgets/markdown.dart';
 
 class CaseStudyScreen extends StatefulWidget with Navigation {
   final CaseStudy caseStudy;
@@ -59,44 +60,42 @@ class _CaseStudyScreenState extends State<CaseStudyScreen> {
     return Scaffold(
       body: SafeArea(
         minimum: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Expanded(
-              flex: 3,
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: widget.caseStudy.sections.length,
-                itemBuilder: (context, index) {
-                  final section = widget.caseStudy.sections[index];
-
-                  return LoadingWidget(
-                    caseStudy: widget.caseStudy,
-                    builder: (caseStudy) {
-                      return Center(
-                        child: Text(section),
+        child: LoadingWidget(
+          caseStudy: widget.caseStudy,
+          builder: (caseStudy) {
+            return Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: PageView.builder(
+                    controller: _controller,
+                    itemCount: widget.caseStudy.sections.length,
+                    itemBuilder: (context, index) {
+                      return Markdown(
+                        text: widget.caseStudy.sections[index],
                       );
                     },
-                  );
-                },
-              ),
-            ),
-            Flexible(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 16,
-                children: [
-                  FilledButton(
-                    onPressed: _back(),
-                    child: Text('Back'),
                   ),
-                  FilledButton(
-                    onPressed: _next(),
-                    child: Text('Next'),
+                ),
+                Flexible(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 16,
+                    children: [
+                      FilledButton(
+                        onPressed: _back(),
+                        child: Text('Back'),
+                      ),
+                      FilledButton(
+                        onPressed: _next(),
+                        child: Text('Next'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

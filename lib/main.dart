@@ -59,11 +59,41 @@ class MainApp extends StatelessWidget with Navigation {
           ),
         ),
         textTheme: TextTheme(
+          headlineLarge: GoogleFonts.courierPrime(
+            color: CustomColors.matrixGreen,
+            fontSize: 48,
+          ),
           headlineMedium: GoogleFonts.courierPrime(
             color: CustomColors.matrixGreen,
+            fontSize: 36,
+          ),
+          headlineSmall: GoogleFonts.courierPrime(
+            color: CustomColors.matrixGreen,
+            fontSize: 28,
           ),
           bodyMedium: GoogleFonts.courierPrime(
             color: CustomColors.matrixGreen,
+          ),
+        ),
+        primaryTextTheme: TextTheme(
+          headlineLarge: GoogleFonts.courierPrime(
+            color: CustomColors.matrixBlack,
+            backgroundColor: CustomColors.matrixGreen,
+            fontSize: 48,
+          ),
+          headlineMedium: GoogleFonts.courierPrime(
+            color: CustomColors.matrixBlack,
+            backgroundColor: CustomColors.matrixGreen,
+            fontSize: 36,
+          ),
+          headlineSmall: GoogleFonts.courierPrime(
+            color: CustomColors.matrixBlack,
+            backgroundColor: CustomColors.matrixGreen,
+            fontSize: 28,
+          ),
+          bodyMedium: GoogleFonts.courierPrime(
+            color: CustomColors.matrixBlack,
+            backgroundColor: CustomColors.matrixGreen,
           ),
         ),
       ),
