@@ -30,6 +30,7 @@ class MainApp extends StatelessWidget with Navigation {
               WidgetState.hovered: CustomColors.matrixBlack,
               WidgetState.pressed: CustomColors.matrixGreen.shade400,
               WidgetState.selected: CustomColors.matrixGreen.shade400,
+              WidgetState.disabled: CustomColors.matrixGreen.shade600,
               WidgetState.any: CustomColors.matrixGreen,
             }),
             foregroundColor: WidgetStateColor.fromMap({
@@ -37,6 +38,7 @@ class MainApp extends StatelessWidget with Navigation {
               WidgetState.hovered: CustomColors.matrixGreen.shade400,
               WidgetState.pressed: CustomColors.matrixBlack,
               WidgetState.selected: CustomColors.matrixBlack,
+              WidgetState.disabled: CustomColors.matrixBlack,
               WidgetState.any: CustomColors.matrixBlack,
             }),
             textStyle: WidgetStateProperty.fromMap({
