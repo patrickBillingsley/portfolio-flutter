@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/models/case_study.dart';
 import 'package:patrick_billingsley_portfolio/screens/case_study_screen.dart';
+import 'package:patrick_billingsley_portfolio/screens/contact_screen.dart';
 import 'package:patrick_billingsley_portfolio/screens/menu_screen.dart';
 
 class MenuButton extends StatefulWidget {
@@ -79,7 +80,7 @@ class _MenuButtonState extends State<MenuButton> with SingleTickerProviderStateM
           child: Opacity(
             opacity: _controller.value,
             child: FilledButton(
-              onPressed: () {},
+              onPressed: _controller.value == 1.0 ? ContactScreen().show : null,
               child: Text('Contact'),
             ),
           ),
