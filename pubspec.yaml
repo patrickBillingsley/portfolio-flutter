@@ -24,3 +24,4 @@ flutter:
   assets:
     - assets/images/
     - assets/case_studies/
+    - assets/fonts/

@@ -14,9 +14,12 @@ class _MatrixTransitionScreenState extends State<MatrixTransitionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        children: [
-          MatrixColumn(),
-        ],
+        children: List.generate(20, (index) {
+          return Positioned(
+            left: 60.0 * index,
+            child: MatrixColumn(),
+          );
+        }),
       ),
     );
   }

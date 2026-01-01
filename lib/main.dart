@@ -148,6 +148,7 @@ final scenes = [
 
 class CustomColors {
   static const MaterialColor matrixGreen = MaterialColor(_matrixGreenPrimaryValue, {
+    300: Color(0xFFE1FECC),
     400: Color(0xFF00FF41),
     500: Color(_matrixGreenPrimaryValue),
     600: Color(0xFF003B00),
