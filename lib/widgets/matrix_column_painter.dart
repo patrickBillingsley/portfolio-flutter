@@ -70,7 +70,7 @@ class MatrixColumnPainter extends CustomPainter {
       return;
     }
 
-    final paint = _gradientFrom(Size(size.width, charHeight! * 20));
+    final paint = _gradientFrom(Size(size.width, charHeight! * 30));
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle());
     builder.pushStyle(
       ui.TextStyle(

@@ -11,16 +11,20 @@ mixin Navigation {
     navigatorKey.currentState!.push(
       PageRouteBuilder(
         transitionDuration: const Duration(seconds: 2),
-        reverseTransitionDuration: const Duration(seconds: 2),
+        reverseTransitionDuration: const Duration(milliseconds: 2),
         pageBuilder: (context, animation, secondaryAnimation) => this as Widget,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          if (animation.isCompleted) {
+            return child;
+          }
+
           return Stack(
             children: [
-              FadeTransition(
-                opacity: animation,
+              ClipRect(
+                clipper: SwipeClipper(animation: animation),
                 child: child,
               ),
-              if (animation.value < 1.0)
+              if (!animation.isCompleted && animation.isForwardOrCompleted)
                 MatrixTransitionScreen(
                   animation: animation,
                 ),
@@ -30,4 +34,25 @@ mixin Navigation {
       ),
     );
   }
+}
+
+class SwipeClipper extends CustomClipper<Rect> {
+  final Animation<double> animation;
+
+  const SwipeClipper({
+    required this.animation,
+  });
+
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(
+      0,
+      0,
+      size.width,
+      size.height * animation.value,
+    );
+  }
+
+  @override
+  bool shouldReclip(_) => true;
 }

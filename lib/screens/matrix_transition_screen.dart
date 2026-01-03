@@ -25,14 +25,16 @@ class _MatrixTransitionScreenState extends State<MatrixTransitionScreen> {
       builder: (context, constraints) {
         final width = constraints.biggest.width;
         final columnCount = (width / 10).round();
-        top ??= List.generate(columnCount, (_) => max(0.0, 600 * Random().nextDouble()));
-        left ??= List.generate(columnCount, (index) => max(5.0, 20 * index * Random().nextDouble()));
+        final random = Random();
+        top ??= List.generate(columnCount, (_) => 600 * random.nextDouble());
+        left ??= List.generate(columnCount, (index) => max(5.0, 20 * index * random.nextDouble()));
 
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: Stack(
             children: List.generate(columnCount, (index) {
               return Positioned(
+                key: ValueKey('column-$index'),
                 top: top?[index],
                 left: left?[index],
                 bottom: 0,
