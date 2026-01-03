@@ -1,24 +1,31 @@
 import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
+import 'package:flutter/animation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:patrick_billingsley_portfolio/constants.dart';
 import 'package:patrick_billingsley_portfolio/main.dart';
 
 class MatrixColumnPainter extends CustomPainter {
-  final List<String> characters;
+  final Animation<double> controller;
+  final List<String>? chars;
+  final double? charHeight;
+  final Function({required List<String> chars, required double charHeight}) characterSetter;
 
-  const MatrixColumnPainter({
-    required this.characters,
+  MatrixColumnPainter({
+    required this.controller,
+    this.chars,
+    this.charHeight = 0,
+    required this.characterSetter,
   });
 
-  String get text => characters.join('\n');
   ui.TextStyle get defaultStyle => ui.TextStyle(
     fontSize: 20,
-    fontFamily: GoogleFonts.sourceCodePro().fontFamily,
+    fontFamily: 'SourceCodePro',
   );
 
-  double _calculateCharacterHeight(double width) {
+  double _calcCharHeight(double width) {
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle());
     builder.pushStyle(defaultStyle);
     builder.addText('A');
@@ -28,43 +35,57 @@ class MatrixColumnPainter extends CustomPainter {
   }
 
   Paint _gradientFrom(Size size) {
-    final charHeight = _calculateCharacterHeight(size.width);
-    final charCount = characters.length;
-    final top = charHeight * (charCount - 20);
-
+    final stops = [0.01, 0.02, 0.1, 0.4, 0.95, 0.95];
+    final range = List.generate(chars!.length + 40, (index) {
+      return index - 20;
+    });
+    final index = (clampDouble(range.length * controller.value, 0, range.length - 1)).floor();
+    final top = charHeight! * range[index];
     return Paint()
       ..shader = LinearGradient(
         begin: AlignmentGeometry.topCenter,
         end: AlignmentGeometry.bottomCenter,
-        stops: [0.0, 0.02, 0.1, 0.4, 0.9],
+        stops: stops,
         colors: [
-          CustomColors.matrixBlack,
+          Color(0x00000000),
           CustomColors.matrixGreen.shade600,
           CustomColors.matrixGreen.shade500,
           CustomColors.matrixGreen.shade400,
           CustomColors.matrixGreen.shade300,
+          Color(0x00000000),
         ],
-      ).createShader(Rect.fromLTWH(0, top, size.width, charHeight * 20));
+      ).createShader(Rect.fromLTWH(0, top, size.width, size.height));
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = _gradientFrom(size);
+    if (chars == null || charHeight == null) {
+      final charHeight = _calcCharHeight(size.width);
+      final charCount = (size.height / charHeight).round();
+      characterSetter.call(
+        chars: characters.sample(charCount),
+        charHeight: charHeight,
+      );
+
+      return;
+    }
+
+    final paint = _gradientFrom(Size(size.width, charHeight! * 20));
     final builder = ui.ParagraphBuilder(ui.ParagraphStyle());
     builder.pushStyle(
       ui.TextStyle(
         fontSize: 20,
-        fontFamily: GoogleFonts.sourceCodePro().fontFamily,
+        fontFamily: 'SourceCodePro',
         foreground: paint,
       ),
     );
-    builder.addText(text);
+    builder.addText(chars!.join('\n'));
     final paragraph = builder.build()..layout(ui.ParagraphConstraints(width: size.width));
     canvas.drawParagraph(paragraph, Offset.zero);
   }
 
   @override
   bool shouldRepaint(MatrixColumnPainter oldDelegate) {
-    return characters.equals(oldDelegate.characters);
+    return true;
   }
 }
