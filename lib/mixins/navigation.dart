@@ -24,10 +24,7 @@ mixin Navigation {
                 clipper: SwipeClipper(animation: animation),
                 child: child,
               ),
-              if (!animation.isCompleted && animation.isForwardOrCompleted)
-                MatrixTransitionScreen(
-                  animation: animation,
-                ),
+              if (!animation.isCompleted && animation.isForwardOrCompleted) MatrixTransitionScreen(),
             ],
           );
         },

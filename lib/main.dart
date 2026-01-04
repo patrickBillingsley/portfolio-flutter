@@ -5,9 +5,12 @@ import 'package:patrick_billingsley_portfolio/mixins/navigation.dart';
 import 'package:patrick_billingsley_portfolio/models/fixture.dart';
 import 'package:patrick_billingsley_portfolio/screens/home_screen.dart';
 import 'package:patrick_billingsley_portfolio/services/scroll_service.dart';
+import 'package:rive/rive.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await RiveNative.init();
   FixtureBloc().scenes.addAll(scenes);
 
   runApp(const MainApp());

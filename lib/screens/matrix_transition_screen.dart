@@ -1,51 +1,48 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:patrick_billingsley_portfolio/widgets/matrix_column.dart';
+import 'package:rive/rive.dart';
 
 class MatrixTransitionScreen extends StatefulWidget {
-  final Animation<double> animation;
-
-  const MatrixTransitionScreen({
-    super.key,
-    required this.animation,
-  });
+  const MatrixTransitionScreen({super.key});
 
   @override
   State<MatrixTransitionScreen> createState() => _MatrixTransitionScreenState();
 }
 
 class _MatrixTransitionScreenState extends State<MatrixTransitionScreen> {
-  List<double>? top;
-  List<double>? left;
+  late File file;
+  late RiveWidgetController controller;
+  bool isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initRive();
+  }
+
+  @override
+  void dispose() {
+    file.dispose();
+    controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> initRive() async {
+    file = (await File.asset('assets/animations/matrix_transition.riv', riveFactory: Factory.rive))!;
+    controller = RiveWidgetController(file);
+    setState(() {
+      isInitialized = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.biggest.width;
-        final columnCount = (width / 10).round();
-        final random = Random();
-        top ??= List.generate(columnCount, (_) => 600 * random.nextDouble());
-        left ??= List.generate(columnCount, (index) => max(5.0, 20 * index * random.nextDouble()));
+    if (!isInitialized) {
+      return const SizedBox();
+    }
 
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Stack(
-            children: List.generate(columnCount, (index) {
-              return Positioned(
-                key: ValueKey('column-$index'),
-                top: top?[index],
-                left: left?[index],
-                bottom: 0,
-                child: MatrixColumn(
-                  animation: widget.animation,
-                ),
-              );
-            }),
-          ),
-        );
-      },
+    return RiveWidget(
+      controller: controller,
+      fit: Fit.cover,
     );
   }
 }
