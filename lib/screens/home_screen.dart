@@ -9,11 +9,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Center(
-          child: Row(
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Container(
-                alignment: Alignment.centerRight,
+              FittedBox(
                 child: Text(
                   'Patrick Billingsley',
                   style: Theme.of(context).textTheme.headlineMedium,
