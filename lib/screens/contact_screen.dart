@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/main.dart';
 import 'package:patrick_billingsley_portfolio/mixins/navigation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactScreen extends StatefulWidget with Navigation {
   const ContactScreen({super.key});
@@ -15,6 +16,8 @@ class _ContactScreenState extends State<ContactScreen> {
 
   int _questionIndex = 0;
 
+  bool get _isLastQuestion => _questionIndex + 1 >= Field.values.length;
+
   @override
   void dispose() {
     for (final controller in _controllers.values) {
@@ -27,9 +30,20 @@ class _ContactScreenState extends State<ContactScreen> {
   }
 
   void _nextQuestion([_]) {
-    if (_questionIndex + 1 >= Field.values.length) return;
+    if (_isLastQuestion) return;
 
     _setQuestion(_questionIndex + 1);
+  }
+
+  Future<void> _submit([_]) async {
+    final url = Uri.parse('mailto:prbillingsley89@gmail.com').replace(
+      queryParameters: {
+        'subject': 'We have to talk!',
+        'body': Field.values.map(_valueFor).join('\n'),
+      },
+    );
+
+    await launchUrl(url);
   }
 
   void _setQuestion(int index) {
@@ -60,7 +74,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   Text('${field.question} '),
                   Expanded(
                     child: TextField(
-                      onSubmitted: _nextQuestion,
+                      onSubmitted: _isLastQuestion ? _submit : _nextQuestion,
                       controller: _controllers[field],
                       focusNode: _focusNodes[field],
                       autofocus: true,
