@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patrick_billingsley_portfolio/main.dart';
 import 'package:patrick_billingsley_portfolio/mixins/navigation.dart';
+import 'package:patrick_billingsley_portfolio/widgets/typing_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactScreen extends StatefulWidget with Navigation {
@@ -71,7 +72,7 @@ class _ContactScreenState extends State<ContactScreen> {
 
               return Row(
                 children: [
-                  Text('${field.question} '),
+                  TypingText('${field.question} '),
                   Expanded(
                     child: TextField(
                       onSubmitted: _isLastQuestion ? _submit : _nextQuestion,
